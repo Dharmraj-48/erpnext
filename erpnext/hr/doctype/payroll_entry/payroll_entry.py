@@ -430,7 +430,7 @@ def get_start_end_dates(payroll_frequency, start_date=None, company=None):
 	if payroll_frequency == "Weekly":
 		end_date = add_days(start_date, 6)
 
-	if payroll_frequency == "Fortnightly":
+	if payroll_frequency == "Every two weeks":
 		end_date = add_days(start_date, 13)
 
 	if payroll_frequency == "Daily":
@@ -443,7 +443,7 @@ def get_start_end_dates(payroll_frequency, start_date=None, company=None):
 def get_frequency_kwargs(frequency_name):
 	frequency_dict = {
 		'monthly': {'months': 1},
-		'fortnightly': {'days': 14},
+		'Every two weeks': {'days': 14},
 		'weekly': {'days': 7},
 		'daily': {'days': 1}
 	}
@@ -456,7 +456,7 @@ def get_end_date(start_date, frequency):
 	frequency = frequency.lower() if frequency else 'monthly'
 	kwargs = get_frequency_kwargs(frequency) if frequency != 'bimonthly' else get_frequency_kwargs('monthly')
 
-	# weekly, fortnightly and daily intervals have fixed days so no problems
+	# weekly, Every two weeks and daily intervals have fixed days so no problems
 	end_date = add_to_date(start_date, **kwargs) - relativedelta(days=1)
 	if frequency != 'bimonthly':
 		return dict(end_date=end_date.strftime(DATE_FORMAT))

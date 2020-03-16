@@ -306,7 +306,7 @@ def get_annual_component_pay(frequency, amount):
 		return amount * 365
 	elif frequency == "Weekly":
 		return amount * 52
-	elif frequency == "Fortnightly":
+	elif frequency == "Every two weeks":
 		return amount * 26
 	elif frequency == "Monthly":
 		return amount * 12
