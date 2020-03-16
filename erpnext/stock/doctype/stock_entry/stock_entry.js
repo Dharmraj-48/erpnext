@@ -127,7 +127,7 @@ frappe.ui.form.on('Stock Entry', {
 		if(!frm.doc.docstatus) {
 			// allow user to select Item Batches manually
 			frappe.db.get_value("Stock Settings", "Stock Settings", "automatically_set_batch_nos_based_on_fifo", (r) => {
-				if (!r.message.automatically_set_batch_nos_based_on_fifo) {
+				if (!cint(r.automatically_set_batch_nos_based_on_fifo)) {
 					frm.add_custom_button(__('Select Item Batches'), () => {
 						frm.trigger("select_batch_no");
 					});
@@ -856,18 +856,10 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 					if (me.frm.doc.purpose == "Manufacture" || me.frm.doc.purpose == "Material Consumption for Manufacture" ) {
 						if (me.frm.doc.purpose == "Manufacture") {
 							if (!me.frm.doc.to_warehouse) me.frm.set_value("to_warehouse", r.message["fg_warehouse"]);
-							if (r.message["additional_costs"].length) {
-								me.frm.clear_table("additional_costs");
-
-								$.each(r.message["additional_costs"], function(i, row) {
-									me.frm.add_child("additional_costs", row);
-								})
-								refresh_field("additional_costs");
-							}
 						}
 						if (!me.frm.doc.from_warehouse) me.frm.set_value("from_warehouse", r.message["wip_warehouse"]);
 					}
-					me.get_items()
+					me.get_items();
 				}
 			}
 		});

@@ -3,18 +3,23 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
+
 import json
-from six import iteritems
-from frappe.model.document import Document
-from frappe import _
 from collections import OrderedDict
-from frappe.utils import floor, flt, today, cint
-from frappe.model.mapper import get_mapped_doc, map_child_doc
+
+from six import iteritems
+
+import frappe
+from erpnext.selling.doctype.sales_order.sales_order import \
+	make_delivery_note as create_delivery_note_from_sales_order
 from erpnext.stock.get_item_details import get_conversion_factor
-from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note as create_delivery_note_from_sales_order
+from frappe import _
+from frappe.model.document import Document
+from frappe.model.mapper import get_mapped_doc, map_child_doc
+from frappe.utils import cint, floor, flt, today
 
 # TODO: Prioritize SO or WO group warehouse
+
 
 class PickList(Document):
 	def before_save(self):
@@ -74,13 +79,13 @@ class PickList(Document):
 
 			if item_map.get(key):
 				item_map[key].qty += item.qty
-				item_map[key].stock_qty += item.stock_qty
+				item_map[key].stock_qty += flt(item.stock_qty)
 			else:
 				item_map[key] = item
 
 			# maintain count of each item (useful to limit get query)
 			self.item_count_map.setdefault(item_code, 0)
-			self.item_count_map[item_code] += item.stock_qty
+			self.item_count_map[item_code] += flt(item.stock_qty)
 
 		return item_map.values()
 
@@ -233,7 +238,7 @@ def create_delivery_note(source_name, target_doc=None):
 	sales_orders = [d.sales_order for d in pick_list.locations]
 	sales_orders = set(sales_orders)
 
-	delivery_note = None
+	delivery_note = frappe.new_doc("Delivery Note")
 	for sales_order in sales_orders:
 		delivery_note = create_delivery_note_from_sales_order(sales_order,
 			delivery_note, skip_item_mapping=True)
